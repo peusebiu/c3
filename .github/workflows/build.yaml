@@ -28,12 +28,8 @@ jobs:
           - debian-bullseye
           - ubuntu-jammy
           - rockylinux-9
-        image:
-          - static
-          - base
-          - openj9
-          - go-devel
-          - openj9-devel
+        image-dir:
+          - images
     steps:
       - name: Check out source code
         uses: actions/checkout@v3
@@ -74,9 +70,9 @@ jobs:
           sed -i s/8080/5000/g config-cve.json
           podman run -d -p 5000:5000 -v $PWD/config-cve.json:/etc/zot/config.json ghcr.io/project-zot/zot-linux-amd64:latest
       - name: Build and push container images
-        uses: project-stacker/stacker-build-push-action@main
+        uses: peusebiu/stacker-build-push-action@add_stacker_args
         with:
-          file: images/${{ matrix.image }}/stacker.yaml
+          dir: ${{ matrix.image-dir }}
           build-args: |
             REVISION=${{ env.SHA }}
             DESCRIPTION="${{ env.DESCRIPTION }}"
@@ -122,12 +118,8 @@ jobs:
           - debian-bullseye
           - ubuntu-jammy
           - rockylinux-9
-        image:
-          - static
-          - base
-          - openj9
-          - go-devel
-          - openj9-devel
+        image-dir:
+          - images
     steps:
       - name: Check out source code
         uses: actions/checkout@v3
@@ -163,7 +155,7 @@ jobs:
       - name: Publish container images to zothub.io
         uses: project-stacker/stacker-build-push-action@main
         with:
-          file: images/${{ matrix.image }}/stacker.yaml
+          dir: ${{ matrix.image-dir }}
           build-args: |
             REVISION=${{ env.SHA }}
             DESCRIPTION="${{ env.DESCRIPTION }}"
